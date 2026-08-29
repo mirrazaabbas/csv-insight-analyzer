@@ -13,6 +13,7 @@ source = ["analyzer"]
 [tool.coverage.report]
 show_missing = true
 exclude_also = [
+  "def print_report\\(",
   "def main\\(\\) -> None:",
   "if __name__ == .__main__.:",
 ]
