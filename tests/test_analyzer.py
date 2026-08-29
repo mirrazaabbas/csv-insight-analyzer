@@ -15,6 +15,7 @@ class CsvAnalyzerTests(unittest.TestCase):
         self.assertEqual(report["rows"], 2)
         self.assertEqual(report["total_revenue"], 300.0)
         self.assertEqual(report["top_region"][0], "South")
+        self.assertEqual(report["top_product"][0], "AI")
 
     def test_validation_errors(self):
         with self.assertRaises(ValueError):
@@ -23,13 +24,35 @@ class CsvAnalyzerTests(unittest.TestCase):
             analyzer.to_float("not-a-number", 2)
         with self.assertRaises(ValueError):
             analyzer.analyze_sales([{"region": "", "product": "AI", "revenue": "10"}])
+        with self.assertRaises(ValueError):
+            analyzer.analyze_sales([{"region": "North", "product": "", "revenue": "10"}])
 
-    def test_load_rows_schema(self):
+    def test_load_rows_schema_and_missing_files(self):
         with tempfile.TemporaryDirectory() as tmp:
-            bad = Path(tmp) / "bad.csv"
+            folder = Path(tmp)
+            bad = folder / "bad.csv"
             bad.write_text("region,revenue\nNorth,10\n", encoding="utf-8")
             with self.assertRaises(ValueError):
                 analyzer.load_rows(bad)
+
+            empty = folder / "empty.csv"
+            empty.write_text("", encoding="utf-8")
+            with self.assertRaises(ValueError):
+                analyzer.load_rows(empty)
+
+            valid = folder / "valid.csv"
+            valid.write_text(
+                "region,product,revenue\nNorth,AI,1,200\n",
+                encoding="utf-8",
+            )
+            rows = analyzer.load_rows(valid)
+            self.assertEqual(rows[0]["region"], "North")
+
+            with self.assertRaises(ValueError):
+                analyzer.load_rows(folder / "missing.csv")
+
+    def test_comma_separated_revenue(self):
+        self.assertEqual(analyzer.to_float("1,250.50", 2), 1250.5)
 
 
 if __name__ == "__main__":
