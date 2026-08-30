@@ -14,6 +14,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: ["3.10", "3.11", "3.12"]
     steps:
@@ -21,15 +22,25 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install quality tools
-        run: python -m pip install --upgrade pip -r requirements-dev.txt
+      - name: Install quality and build tools
+        run: python -m pip install --upgrade pip -r requirements-dev.txt build
       - name: Compile sources
-        run: python -m compileall -q analyzer.py data_quality.py tests
+        run: python -m compileall -q analyzer.py data_quality.py insights.py reporting.py ai_features.py ai_platform.py tests
       - name: Lint
         run: ruff check . --output-format=github
       - name: Run tests with coverage
         run: |
           coverage run -m unittest discover -s tests -v
           coverage report --fail-under=80
-      - name: Smoke test analyzer
+      - name: Smoke test sales report
         run: python analyzer.py sample_sales.csv
+      - name: Smoke test generic profiling and reports
+        run: python analyzer.py sample_sales.csv --profile --json /tmp/csv-report.json --html /tmp/csv-report.html
+      - name: Build installable package
+        run: python -m build
+      - name: Install wheel and smoke-test CLI
+        run: |
+          python -m pip install --force-reinstall dist/*.whl
+          cd /tmp
+          csv-insights --help
+          python -c "import analyzer, data_quality, insights, reporting"
