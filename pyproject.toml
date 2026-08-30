@@ -8,7 +8,7 @@ ignore = ["E501"]
 
 [tool.coverage.run]
 branch = true
-source = ["analyzer"]
+source = ["analyzer", "data_quality"]
 
 [tool.coverage.report]
 show_missing = true
