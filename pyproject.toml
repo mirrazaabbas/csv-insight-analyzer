@@ -1,3 +1,42 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "csv-insight-analyzer"
+version = "1.0.0"
+description = "Dependency-free CSV sales analytics, data-quality profiling, correlations, time-series summaries and reports."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+authors = [{name = "Mir Raza Abbas"}]
+keywords = ["csv", "data-analysis", "data-quality", "time-series", "analytics"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+dependencies = []
+
+[project.scripts]
+csv-insights = "analyzer:main"
+
+[project.urls]
+Homepage = "https://github.com/mirrazaabbas/csv-insight-analyzer"
+Repository = "https://github.com/mirrazaabbas/csv-insight-analyzer"
+Issues = "https://github.com/mirrazaabbas/csv-insight-analyzer/issues"
+
+[tool.setuptools]
+py-modules = [
+  "analyzer",
+  "data_quality",
+  "insights",
+  "reporting",
+  "ai_features",
+  "ai_platform",
+]
+
 [tool.ruff]
 target-version = "py310"
 line-length = 100
@@ -8,7 +47,7 @@ ignore = ["E501"]
 
 [tool.coverage.run]
 branch = true
-source = ["analyzer", "data_quality"]
+source = ["analyzer", "data_quality", "insights", "reporting"]
 
 [tool.coverage.report]
 show_missing = true
